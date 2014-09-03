@@ -1,19 +1,19 @@
 package coding_theory;
 
-import java.util.ArrayList;
 import java.util.PriorityQueue;
 
 public class HuffmanCode {
 	// input is an array of frequencies, indexed by character code
-	
+
 	public static HuffmanTree buildTree(int[] charFreqs) {
-//		public static HuffmanTree buildTree(ArrayList<Integer> charFreqs) {
+		// public static HuffmanTree buildTree(ArrayList<Integer> charFreqs) {
 		PriorityQueue<HuffmanTree> trees = new PriorityQueue<HuffmanTree>();
 		// initially, we have a forest of leaves
 		// one for each non-empty character
 		for (int i = 0; i < charFreqs.length; i++)
 			if (charFreqs[i] > 0)
-				trees.offer(new HuffmanLeaf(charFreqs[i], (char) (i + 97)));
+				trees.offer(new HuffmanLeaf(charFreqs[i], (char) (i)));
+		// trees.offer(new HuffmanLeaf(charFreqs[i], (char) (i + 97)));
 
 		assert trees.size() > 0;
 		// loop until there is only one tree left
