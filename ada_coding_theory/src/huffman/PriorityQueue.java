@@ -5,82 +5,71 @@ import java.util.Comparator;
 /*
  * A min priority queue
  */
-public class MinPQ<Node> {
-	private Node[] nodesPQ;
-	private int n;
-	private Comparator<Node> comparator;
+public class PriorityQueue<E> {
+	private E[] nodesPQ;
+	private int size;
+	private Comparator<E> comparator;
 
-	public MinPQ(int capacity) {
-		this.n = 0;
-		nodesPQ = (Node[]) new Object[n + 1];
-	}
-
-	public MinPQ(int capacity, Comparator<Node> com) {
-		this.n = 0;
-		this.comparator = comparator;
-		nodesPQ = (Node[]) new Object[n + 1];
-	}
-
-	public MinPQ(Node[] nodes) {
-		n = nodes.length;
-		nodesPQ = (Node[]) new Object[n + 1];
-		for (int i = 0; i < n; i++) {
+	public PriorityQueue(E[] nodes) {
+		size = nodes.length;
+		nodesPQ = (E[]) new Object[size + 1];
+		for (int i = 0; i < size; i++) {
 			nodesPQ[i + 1] = nodes[i];
 		}
-		for (int i = n / 2; i >= 1; i--) {
+		for (int i = size / 2; i >= 1; i--) {
 			sink(i);
 		}
 	}
 
 	public boolean isEmpty() {
-		return n == 0;
+		return size == 0;
 	}
 
 	public int size() {
-		return n;
+		return size;
 	}
 
-	public Node min() {
+	public E min() {
 		if (isEmpty()) {
 			return null;
 		}
-		Node node = nodesPQ[1];
-		swap(1, n);
-		n--;
+		E node = nodesPQ[1];
+		swap(1, size);
+		size--;
 		sink(1);
-		nodesPQ[n + 1] = null;
+		nodesPQ[size + 1] = null;
 		return node;
 	}
 
-	public Node peek() {
+	public E peek() {
 		if (isEmpty()) {
 			return null;
 		}
-		Node node = nodesPQ[1];
+		E node = nodesPQ[1];
 		return node;
 	}
 
-	public void insert(Node node) {
-		if (n == nodesPQ.length - 1) {
-			resize(2 * n + 1);
+	public void insert(E node) {
+		if (size == nodesPQ.length - 1) {
+			resize(2 * size + 1);
 		}
-		n++;
-		nodesPQ[n] = node;
-		swim(n);
+		size++;
+		nodesPQ[size] = node;
+		swim(size);
 	}
 
 	private void resize(int i) {
-		Node[] temp = (Node[]) new Object[i];
-		for (int j = 1; j < n + 1; j++) {
+		E[] temp = (E[]) new Object[i];
+		for (int j = 1; j < size + 1; j++) {
 			temp[j] = nodesPQ[j];
 		}
 		nodesPQ = temp;
 	}
 
 	private void sink(int index) {
-		while (index * 2 <= n) {
+		while (index * 2 <= size) {
 			int childIndex = 2 * index;
-			if (childIndex < n && less(childIndex + 1, childIndex)) {
+			if (childIndex < size && less(childIndex + 1, childIndex)) {
 				childIndex++;
 			}
 			if (less(index, childIndex)) {
@@ -99,14 +88,14 @@ public class MinPQ<Node> {
 	}
 
 	private void swap(int index, int childIndex) {
-		Node tmp = nodesPQ[index];
+		E tmp = nodesPQ[index];
 		nodesPQ[index] = nodesPQ[childIndex];
 		nodesPQ[childIndex] = tmp;
 	}
 
 	private boolean less(int index, int childIndex) {
 		if (comparator == null) {
-			return ((Comparable<Node>) nodesPQ[index])
+			return ((Comparable<E>) nodesPQ[index])
 					.compareTo(nodesPQ[childIndex]) < 0;
 		} else {
 			return comparator.compare(nodesPQ[index], nodesPQ[childIndex]) < 0;
