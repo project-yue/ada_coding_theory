@@ -13,6 +13,12 @@ import java.util.BitSet;
 import java.util.Stack;
 import java.util.StringTokenizer;
 
+/**
+ * Huffman Code
+ * 
+ * @author go
+ * @version 06-09-14 compression and decompression work
+ */
 public class HuffmanCode {
 	// the frequency of all letters in the txt
 	// the issue becomes counting frequency
@@ -57,39 +63,6 @@ public class HuffmanCode {
 		decompressBytes();
 	}
 
-	/*
-	 * write the compressed word list (in bytes) to file
-	 */
-	private void writeBytesToFile() {
-		FileOutputStream out = null;
-		try {
-			out = new FileOutputStream("wordlist_compressed.txt");
-			byte[] bytes = compressWord(allWords.toString());
-			for (int i = 0; i < bytes.length; i++) {
-				out.write(bytes[i]);
-			}
-			out.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void writeStringToFile() {
-		FileOutputStream out = null;
-		try {
-			out = new FileOutputStream("wordlist_decompressed.txt");
-			PrintStream ps = new PrintStream(out);
-			for (String temp : this.decompressLst) {
-				ps.print(temp + "\n");
-			}
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
 	/**
 	 * compress the string to byte using huffman encoding
 	 * 
@@ -114,57 +87,6 @@ public class HuffmanCode {
 		return toByteArray(bits);
 	}
 
-	/**
-	 * 
-	 */
-	private void decompressBytes() {
-		int n = compressList.size();
-		StringBuilder letters = new StringBuilder();
-		QueueNode head = pq.peek();
-		for (int i = n - 1; i >= 0; i--) {
-			byte b = compressList.get(i);
-			for (int j = 0; j < 8; j++) {
-				// if least significant bit is one
-				if ((b & 1) == 1) {
-					head = head.right;
-				} else {
-					head = head.left;
-				}
-				b = (byte) (b >> 1);
-				if (head.left == null && head.right == null) {
-					letters.append(head.value);
-					head = pq.peek();
-					continue;
-				}
-			}
-		}
-		StringTokenizer elements = new StringTokenizer(letters.toString(), ",");
-		while (elements.hasMoreTokens()) {
-			decompressLst.add(elements.nextToken());
-		}
-		System.out.println(decompressLst.size());
-		writeStringToFile();
-	}
-
-	/**
-	 * write
-	 */
-	private void readBytesFromFile() {
-		FileInputStream in;
-		int c;
-		try {
-			compressList = new ArrayList<Byte>();
-			in = new FileInputStream("wordlist_compressed.txt");
-			while ((c = in.read()) != -1) {
-				compressList.add((byte) c);
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 	/*
 	 * Build a Huffman tree based on the pre-calculated frequency of each
 	 * character. For easier decoding, put a ',' between each word
@@ -183,7 +105,7 @@ public class HuffmanCode {
 			nodes[i] = node;
 		}
 		pq = new PriorityQueue<QueueNode>(nodes);
-		while (pq.size() > 1) {
+		while (pq.size > 1) {
 			QueueNode minFirst = pq.min();
 			QueueNode minSecond = pq.min();
 			QueueNode newNode = new QueueNode('-', minFirst.frequency
@@ -217,7 +139,7 @@ public class HuffmanCode {
 	}
 
 	/*
-	 * look up the bit representation of each character In fact, do a DFS
+	 * look up the bit representation in a dfs manner
 	 */
 	private void lookup(char requiredChar) {
 		huffmanCodeArrayForChar = new int[8];
@@ -278,7 +200,9 @@ public class HuffmanCode {
 		return null;
 	}
 
-	/*
+	// /////////////////I/O///////////////////////////
+
+	/**
 	 * read the words from a txt file
 	 */
 	private void readRawContentFromDoc() {
@@ -296,6 +220,94 @@ public class HuffmanCode {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private void decompressBytes() {
+		int n = compressList.size();
+		StringBuilder letters = new StringBuilder();
+		QueueNode head = pq.peek();
+		for (int i = n - 1; i >= 0; i--) {
+			byte b = compressList.get(i);
+			for (int j = 0; j < 8; j++) {
+				// if least significant bit is one
+				if ((b & 1) == 1) {
+					head = head.right;
+				} else {
+					head = head.left;
+				}
+				b = (byte) (b >> 1);
+				if (head.left == null && head.right == null) {
+					letters.append(head.value);
+					head = pq.peek();
+					continue;
+				}
+			}
+		}
+		StringTokenizer elements = new StringTokenizer(letters.toString(), ",");
+		while (elements.hasMoreTokens()) {
+			decompressLst.add(elements.nextToken());
+		}
+		System.out.println(decompressLst.size());
+		writeStringToFile();
+	}
+
+	/**
+	 * write
+	 */
+	private void readBytesFromFile() {
+		FileInputStream in;
+		int c;
+		try {
+			compressList = new ArrayList<Byte>();
+			in = new FileInputStream("wordlist_compressed.txt");
+			while ((c = in.read()) != -1) {
+				compressList.add((byte) c);
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * write the compressed word list (in bytes) to file
+	 */
+	private void writeBytesToFile() {
+		FileOutputStream out = null;
+		try {
+			out = new FileOutputStream("wordlist_compressed.txt");
+			byte[] bytes = compressWord(allWords.toString());
+			for (int i = 0; i < bytes.length; i++) {
+				out.write(bytes[i]);
+			}
+			out.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * decompression
+	 */
+	private void writeStringToFile() {
+		FileOutputStream out = null;
+		try {
+			out = new FileOutputStream("wordlist_decompressed.txt");
+			PrintStream ps = new PrintStream(out);
+			for (String temp : this.decompressLst) {
+				ps.print(temp + "\n");
+			}
+			ps.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

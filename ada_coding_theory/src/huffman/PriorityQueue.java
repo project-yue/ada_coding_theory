@@ -6,9 +6,9 @@ import java.util.Comparator;
  * A min priority queue
  */
 public class PriorityQueue<E> {
-	private E[] nodesPQ;
-	private int size;
-	private Comparator<E> comparator;
+	public E[] nodesPQ;
+	public int size;
+	public Comparator<E> comparator;
 
 	public PriorityQueue(E[] nodes) {
 		size = nodes.length;
@@ -21,16 +21,8 @@ public class PriorityQueue<E> {
 		}
 	}
 
-	public boolean isEmpty() {
-		return size == 0;
-	}
-
-	public int size() {
-		return size;
-	}
-
 	public E min() {
-		if (isEmpty()) {
+		if (size == 0) {
 			return null;
 		}
 		E node = nodesPQ[1];
@@ -42,7 +34,7 @@ public class PriorityQueue<E> {
 	}
 
 	public E peek() {
-		if (isEmpty()) {
+		if (size == 0) {
 			return null;
 		}
 		E node = nodesPQ[1];
