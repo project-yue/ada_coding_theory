@@ -34,7 +34,7 @@ public class HuffmanCode {
 	public int codeLength = 0;
 	public QueueNode temp;
 	public StringBuilder huffmanCodeString;
-	public String[] huffmanCodeForLetters = new String[27];
+	public String[] huffmanCodeForLetters;
 	public StringBuilder allWords = new StringBuilder();
 	// de
 	public ArrayList<Byte> compressList;
@@ -47,6 +47,7 @@ public class HuffmanCode {
 	}
 
 	public HuffmanCode() {
+		this.huffmanCodeForLetters = new String[27];
 		this.compressList = new ArrayList<>();
 		this.decompressLst = new ArrayList<String>();
 		this.bits = new BitSet();
@@ -87,12 +88,16 @@ public class HuffmanCode {
 		return toByteArray(bits);
 	}
 
-	/*
+	/**
 	 * Build a Huffman tree based on the pre-calculated frequency of each
 	 * character. For easier decoding, put a ',' between each word
 	 * 
 	 * huffmanCodeForLetters : is and String array containing huffman
 	 * representation for each character. For example, [1011,111,...]
+	 * 
+	 * @version 07-09 it currently has no counting frequency function.it reads a
+	 *          preset array and all the symbol frequencies are pre-calculated
+	 *          by other software
 	 */
 	private void buildHuffmanTree() {
 		QueueNode node;
@@ -123,10 +128,10 @@ public class HuffmanCode {
 		huffmanCodeForLetters[26] = huffmanCodeString.toString();
 	}
 
-	/*
+	/**
 	 * Convert a bit sets to the corresponding byte array
 	 * 
-	 * @param Bitset bits
+	 * @param Bitset
 	 */
 	public byte[] toByteArray(BitSet bits) {
 		byte[] bytes = new byte[(bits.length() + 7) / 8];
@@ -138,7 +143,7 @@ public class HuffmanCode {
 		return bytes;
 	}
 
-	/*
+	/**
 	 * look up the bit representation in a dfs manner
 	 */
 	private void lookup(char requiredChar) {
@@ -181,7 +186,7 @@ public class HuffmanCode {
 		resetVisitedNodes(node.right);
 	}
 
-	/*
+	/**
 	 * get next available node during DFS and keep recording the look route
 	 * record 1 if go right record 0 if go left
 	 */
@@ -203,7 +208,8 @@ public class HuffmanCode {
 	// /////////////////I/O///////////////////////////
 
 	/**
-	 * read the words from a txt file
+	 * read the words from a txt file. The process constructs raw data in String
+	 * representation
 	 */
 	private void readRawContentFromDoc() {
 		File mFile = null;
@@ -225,7 +231,8 @@ public class HuffmanCode {
 	}
 
 	/**
-	 * 
+	 * decompression can take a long time as so far it seems going polynomial
+	 * time
 	 */
 	private void decompressBytes() {
 		int n = compressList.size();
@@ -257,7 +264,7 @@ public class HuffmanCode {
 	}
 
 	/**
-	 * write
+	 * read file to bytes
 	 */
 	private void readBytesFromFile() {
 		FileInputStream in;
@@ -276,7 +283,7 @@ public class HuffmanCode {
 	}
 
 	/**
-	 * write the compressed word list (in bytes) to file
+	 * compression write bytes to file
 	 */
 	private void writeBytesToFile() {
 		FileOutputStream out = null;
@@ -295,7 +302,7 @@ public class HuffmanCode {
 	}
 
 	/**
-	 * decompression
+	 * decompression, write string to file
 	 */
 	private void writeStringToFile() {
 		FileOutputStream out = null;
@@ -307,7 +314,6 @@ public class HuffmanCode {
 			}
 			ps.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
