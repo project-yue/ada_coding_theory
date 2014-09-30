@@ -34,7 +34,7 @@ public class HuffmanCode {
 	public int codeLength = 0;
 	public QueueNode temp;
 	public StringBuilder huffmanCodeString;
-	public String[] huffmanCodeForLetters;
+	public String[] symbolArray;
 	public StringBuilder allWords = new StringBuilder();
 	// hold all tokens in byte
 	public ArrayList<Byte> compressList;
@@ -49,7 +49,8 @@ public class HuffmanCode {
 	}
 
 	public HuffmanCode() {
-		this.huffmanCodeForLetters = new String[27];
+		// symbols currently is fixed
+		this.symbolArray = new String[27];
 		this.compressList = new ArrayList<>();
 		this.decompressLst = new ArrayList<>();
 		this.bits = new BitSet();
@@ -75,10 +76,10 @@ public class HuffmanCode {
 		for (int i = 0; i < test.length(); i++) {
 			char c = test.charAt(i);
 			if (c == ',') {
-				s.append(huffmanCodeForLetters[26]);
+				s.append(symbolArray[26]);
 			} else {
 				// ascii arithmetic
-				s.append(huffmanCodeForLetters[(int) (c - 'a')]);
+				s.append(symbolArray[(int) (c - 'a')]);
 			}
 		}
 		for (int i = 0; i < s.length(); i++) {
@@ -94,8 +95,8 @@ public class HuffmanCode {
 	 * Build a Huffman tree based on the pre-calculated frequency of each
 	 * character. For convenience, use ',' as delimiter
 	 * 
-	 * huffmanCodeForLetters : is and String array containing huffman
-	 * representation for each character. For example, [1011,111,...]
+	 * symbolArray : is and String array containing huffman representation for
+	 * each character. For example, [1011,111,...]
 	 * 
 	 * @version 07-09 it currently has no counting frequency function.it reads a
 	 *          preset array and all the symbol frequencies are pre-calculated
@@ -103,6 +104,8 @@ public class HuffmanCode {
 	 */
 	private void buildHuffmanTree() {
 		QueueNode node;
+		// indices are from a-z and the last one for ,
+		// should calculate the frequency
 		for (int i = 0; i < 27; i++) {
 			if (i == 26) {
 				node = new QueueNode(',', ALPHABET[i]);
@@ -111,6 +114,7 @@ public class HuffmanCode {
 			}
 			nodes[i] = node;
 		}
+		//
 		pq = new PriorityQueue<QueueNode>(nodes);
 		while (pq.size > 1) {
 			QueueNode minFirst = pq.min();
@@ -124,14 +128,33 @@ public class HuffmanCode {
 		temp = pq.peek();
 		for (int i = 0; i < 26; i++) {
 			lookup((char) ('a' + i));
-			huffmanCodeForLetters[i] = huffmanCodeString.toString();
+			symbolArray[i] = huffmanCodeString.toString();
 		}
 		lookup(',');
-		huffmanCodeForLetters[26] = huffmanCodeString.toString();
+		symbolArray[26] = huffmanCodeString.toString();
+	}
+
+	private void countFrequency() {
+		File mFile = null;
+		mFile = new File("wordlist.txt");
+		// TODO Auto-generated catch block
+		try {
+			BufferedReader input = new BufferedReader(new FileReader(mFile));
+			String line = null;
+			while ((line = input.readLine()) != null) {
+				allWords.append(line);
+				allWords.append(',');
+			}
+			input.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
-	 * Convert a bit sets to the corresponding byte array
+	 * Convert a bit set to the corresponding byte array
 	 * 
 	 * @param Bitset
 	 */
