@@ -16,7 +16,7 @@ import java.util.StringTokenizer;
 /**
  * Huffman Code
  * 
- * @author go
+ * @author Yue
  * @version 06-09-14 compression and decompression work
  */
 public class HuffmanCode {
@@ -36,20 +36,22 @@ public class HuffmanCode {
 	public StringBuilder huffmanCodeString;
 	public String[] huffmanCodeForLetters;
 	public StringBuilder allWords = new StringBuilder();
-	// de
+	// hold all tokens in byte
 	public ArrayList<Byte> compressList;
+	// hold all tokens in String
 	public ArrayList<String> decompressLst;
 
 	public static void main(String[] args) {
 		HuffmanCode huffman = new HuffmanCode();
 		huffman.compress();
 		huffman.decompress();
+		// huffman.decompress();
 	}
 
 	public HuffmanCode() {
 		this.huffmanCodeForLetters = new String[27];
 		this.compressList = new ArrayList<>();
-		this.decompressLst = new ArrayList<String>();
+		this.decompressLst = new ArrayList<>();
 		this.bits = new BitSet();
 	}
 
@@ -90,7 +92,7 @@ public class HuffmanCode {
 
 	/**
 	 * Build a Huffman tree based on the pre-calculated frequency of each
-	 * character. For easier decoding, put a ',' between each word
+	 * character. For convenience, use ',' as delimiter
 	 * 
 	 * huffmanCodeForLetters : is and String array containing huffman
 	 * representation for each character. For example, [1011,111,...]
@@ -238,7 +240,8 @@ public class HuffmanCode {
 		int n = compressList.size();
 		StringBuilder letters = new StringBuilder();
 		QueueNode head = pq.peek();
-		for (int i = n - 1; i >= 0; i--) {
+		for (int i = n - 1; i > 0; i--) {
+			// for (int i = n - 1; i >= 0; i--) {
 			byte b = compressList.get(i);
 			for (int j = 0; j < 8; j++) {
 				// if least significant bit is one
@@ -272,14 +275,14 @@ public class HuffmanCode {
 		try {
 			compressList = new ArrayList<Byte>();
 			in = new FileInputStream("wordlist_compressed.txt");
+			// read to the end line
 			while ((c = in.read()) != -1) {
 				compressList.add((byte) c);
 			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		System.out.println(compressList.size());
 	}
 
 	/**

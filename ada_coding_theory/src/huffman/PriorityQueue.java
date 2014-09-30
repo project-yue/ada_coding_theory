@@ -2,8 +2,8 @@ package huffman;
 
 import java.util.Comparator;
 
-/*
- * A min priority queue
+/**
+ * A min priority queue with linked structure.
  */
 public class PriorityQueue<E> {
 	public E[] nodesPQ;
@@ -58,13 +58,18 @@ public class PriorityQueue<E> {
 		nodesPQ = temp;
 	}
 
+	/**
+	 * sink node down to the leave
+	 * 
+	 * @param index
+	 */
 	private void sink(int index) {
 		while (index * 2 <= size) {
 			int childIndex = 2 * index;
-			if (childIndex < size && less(childIndex + 1, childIndex)) {
+			if (childIndex < size && isLess(childIndex + 1, childIndex)) {
 				childIndex++;
 			}
-			if (less(index, childIndex)) {
+			if (isLess(index, childIndex)) {
 				break;
 			}
 			swap(index, childIndex);
@@ -72,8 +77,13 @@ public class PriorityQueue<E> {
 		}
 	}
 
+	/**
+	 * bubble node up
+	 * 
+	 * @param index
+	 */
 	private void swim(int index) {
-		while (index > 1 && (less(index, index / 2))) {
+		while (index > 1 && (isLess(index, index / 2))) {
 			swap(index / 2, index);
 			index /= 2;
 		}
@@ -85,7 +95,7 @@ public class PriorityQueue<E> {
 		nodesPQ[childIndex] = tmp;
 	}
 
-	private boolean less(int index, int childIndex) {
+	private boolean isLess(int index, int childIndex) {
 		if (comparator == null) {
 			return ((Comparable<E>) nodesPQ[index])
 					.compareTo(nodesPQ[childIndex]) < 0;
