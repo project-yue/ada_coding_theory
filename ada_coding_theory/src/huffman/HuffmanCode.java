@@ -6,10 +6,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Scanner;
 import java.util.Stack;
 import java.util.StringTokenizer;
 
@@ -23,19 +23,18 @@ public class HuffmanCode {
 	// the frequency of all letters in the txt
 	// the issue becomes counting frequency
 
-	public BitSet bits;
 	public PriorityQueue<QueueNode> pq;
-	// public QueueNode[] nodes = new QueueNode[27];
-	public int[] huffmanCodeArrayForChar;
 	public int codeLength = 0;
 	public QueueNode temp;
 	public StringBuilder huffmanCodeString;
 	public String[] symbolArray;
-	public StringBuilder allWords = new StringBuilder();
+	public StringBuilder allWordsBuffer;
 	// hold all tokens in byte
 	public ArrayList<Byte> compressList;
 	// hold all tokens in String
 	public ArrayList<String> decompressLst;
+	// hold all nodes
+	public ArrayList<QueueNode> nodeLst;
 
 	public static void main(String[] args) {
 		HuffmanCode huffman = new HuffmanCode();
@@ -48,12 +47,12 @@ public class HuffmanCode {
 		this.symbolArray = new String[27];
 		this.compressList = new ArrayList<>();
 		this.decompressLst = new ArrayList<>();
-		this.bits = new BitSet();
+		this.allWordsBuffer = new StringBuilder();
 	}
 
 	public void compress() {
 		buildHuffmanTree();
-		readRawContentFromDoc();
+		readRawContentFromFile();
 		writeBytesToFile();
 	}
 
@@ -67,6 +66,7 @@ public class HuffmanCode {
 	 * 
 	 */
 	private byte[] compressWord(String test) {
+		BitSet bits = new BitSet();
 		StringBuilder s = new StringBuilder();
 		for (int i = 0; i < test.length(); i++) {
 			char c = test.charAt(i);
@@ -99,11 +99,11 @@ public class HuffmanCode {
 	 */
 	private void buildHuffmanTree() {
 		QueueNode node;
-		ArrayList<QueueNode> nodeLst = countFrequency();
+		this.nodeLst = countFrequency();
 		QueueNode[] nodes = new QueueNode[nodeLst.size()];
 		// indices are from a-z and the last one for ,
 		// should calculate the frequency
-		for (int i = 0; i < 27; i++) {
+		for (int i = 0; i < nodeLst.size(); i++) {
 			if (i == 26) {
 				node = new QueueNode(',', nodeLst.get(i).frequency);
 			} else {
@@ -176,7 +176,7 @@ public class HuffmanCode {
 	 * look up the bit representation in a dfs manner
 	 */
 	private void lookup(char requiredChar) {
-		huffmanCodeArrayForChar = new int[8];
+		int[] huffmanCodeArrayForChar = new int[8];
 		codeLength = 0;
 		huffmanCodeString = new StringBuilder();
 		Stack<QueueNode> stack = new Stack<QueueNode>();
@@ -184,7 +184,7 @@ public class HuffmanCode {
 		while (!stack.isEmpty()) {
 			QueueNode node = (QueueNode) stack.peek();
 			node.visited = true;
-			QueueNode nextNode = getNextNode(node);
+			QueueNode nextNode = getNextNode(node, huffmanCodeArrayForChar);
 			if (nextNode == null) {
 				stack.pop();
 				codeLength--;
@@ -219,15 +219,15 @@ public class HuffmanCode {
 	 * get next available node during DFS and keep recording the look route
 	 * record 1 if go right record 0 if go left
 	 */
-	private QueueNode getNextNode(QueueNode node) {
+	private QueueNode getNextNode(QueueNode node, int[] charArray) {
 		QueueNode left = node.left;
 		QueueNode right = node.right;
 		if (left != null && !left.visited) {
-			huffmanCodeArrayForChar[codeLength] = 0;
+			charArray[codeLength] = 0;
 			codeLength++;
 			return left;
 		} else if (right != null && !right.visited) {
-			huffmanCodeArrayForChar[codeLength] = 1;
+			charArray[codeLength] = 1;
 			codeLength++;
 			return right;
 		}
@@ -237,21 +237,20 @@ public class HuffmanCode {
 	// /////////////////I/O///////////////////////////
 
 	/**
-	 * read the words from a txt file. The process constructs raw data in String
+	 * read the words from a file. The process constructs raw data in String
 	 * representation
 	 */
-	private void readRawContentFromDoc() {
-		File mFile = null;
-		mFile = new File("wordlist.txt");
-		// TODO Auto-generated catch block
+	private void readRawContentFromFile() {
+		File tempFile = new File("wordlist.txt");
 		try {
-			BufferedReader input = new BufferedReader(new FileReader(mFile));
+			BufferedReader inputReader = new BufferedReader(new FileReader(
+					tempFile));
 			String line = null;
-			while ((line = input.readLine()) != null) {
-				allWords.append(line);
-				allWords.append(',');
+			while ((line = inputReader.readLine()) != null) {
+				allWordsBuffer.append(line);
+				allWordsBuffer.append(',');
 			}
-			input.close();
+			inputReader.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -296,11 +295,16 @@ public class HuffmanCode {
 		FileInputStream in;
 		int c;
 		try {
-			compressList = new ArrayList<Byte>();
 			in = new FileInputStream("wordlist_compressed.txt");
+			// read header
+			// Scanner reader = new Scanner(in);
+			// System.out.println(reader.nextLine());
+			//
+			compressList = new ArrayList<Byte>();
 			while ((c = in.read()) != -1) {
 				compressList.add((byte) c);
 			}
+			System.out.println("size is " + compressList.size());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -313,7 +317,17 @@ public class HuffmanCode {
 		FileOutputStream out = null;
 		try {
 			out = new FileOutputStream("wordlist_compressed.txt");
-			byte[] bytes = compressWord(allWords.toString());
+			// for generate header
+			// PrintStream ps = new PrintStream(out);
+			// for (int i = 0; i < this.nodeLst.size(); i++) {
+			// ps.print(nodeLst.get(i).frequency);
+			// if (i < this.nodeLst.size() - 1)
+			// ps.print(",");
+			// else
+			// ps.print("#");
+			// }
+			// header ends by a hash symbol
+			byte[] bytes = compressWord(allWordsBuffer.toString());
 			for (int i = 0; i < bytes.length; i++) {
 				out.write(bytes[i]);
 			}
