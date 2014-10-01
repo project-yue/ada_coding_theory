@@ -25,7 +25,7 @@ public class HuffmanCode {
 
 	public BitSet bits;
 	public PriorityQueue<QueueNode> pq;
-	public QueueNode[] nodes = new QueueNode[27];
+	// public QueueNode[] nodes = new QueueNode[27];
 	public int[] huffmanCodeArrayForChar;
 	public int codeLength = 0;
 	public QueueNode temp;
@@ -100,6 +100,7 @@ public class HuffmanCode {
 	private void buildHuffmanTree() {
 		QueueNode node;
 		ArrayList<QueueNode> nodeLst = countFrequency();
+		QueueNode[] nodes = new QueueNode[nodeLst.size()];
 		// indices are from a-z and the last one for ,
 		// should calculate the frequency
 		for (int i = 0; i < 27; i++) {
