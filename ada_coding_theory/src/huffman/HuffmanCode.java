@@ -9,7 +9,6 @@ import java.io.FileReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Scanner;
 import java.util.Stack;
 import java.util.StringTokenizer;
 
@@ -296,15 +295,17 @@ public class HuffmanCode {
 		int c;
 		try {
 			in = new FileInputStream("wordlist_compressed.txt");
-			// read header
-			// Scanner reader = new Scanner(in);
-			// System.out.println(reader.nextLine());
-			//
 			compressList = new ArrayList<Byte>();
+			// skip the header files
+			// this is the length of the header
+			System.out.println(in.read());
+			System.out.println(in.read());
+			System.out.println(in.read());
+			in.skip(155);
+			// read header ends
 			while ((c = in.read()) != -1) {
 				compressList.add((byte) c);
 			}
-			System.out.println("size is " + compressList.size());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -318,15 +319,19 @@ public class HuffmanCode {
 		try {
 			out = new FileOutputStream("wordlist_compressed.txt");
 			// for generate header
-			// PrintStream ps = new PrintStream(out);
-			// for (int i = 0; i < this.nodeLst.size(); i++) {
-			// ps.print(nodeLst.get(i).frequency);
-			// if (i < this.nodeLst.size() - 1)
-			// ps.print(",");
-			// else
-			// ps.print("#");
-			// }
-			// header ends by a hash symbol
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < this.nodeLst.size(); i++) {
+				sb.append(this.nodeLst.get(i).frequency);
+				if (i < this.nodeLst.size() - 1)
+					sb.append(",");
+			}
+			sb.insert(0, sb.toString().getBytes().length);
+			System.out.println("skip byte length "
+					+ sb.toString().getBytes().length);
+			byte[] header = sb.toString().getBytes();
+			for (int i = 0; i < header.length; i++)
+				out.write(header[i]);
+			// header ends
 			byte[] bytes = compressWord(allWordsBuffer.toString());
 			for (int i = 0; i < bytes.length; i++) {
 				out.write(bytes[i]);
