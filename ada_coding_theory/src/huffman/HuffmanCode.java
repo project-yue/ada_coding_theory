@@ -22,10 +22,6 @@ import java.util.StringTokenizer;
 public class HuffmanCode {
 	// the frequency of all letters in the txt
 	// the issue becomes counting frequency
-	public static final int[] ALPHABET = { 61199, 16075, 22995, 25558, 73135,
-			9831, 18504, 17526, 47007, 2486, 11371, 35601, 20106, 38477, 41239,
-			19186, 1152, 44899, 53635, 36024, 26867, 6301, 8576, 2315, 14122,
-			3386, 108236 };
 
 	public BitSet bits;
 	public PriorityQueue<QueueNode> pq;
@@ -123,7 +119,6 @@ public class HuffmanCode {
 			newNode.left = minFirst;
 			newNode.right = minSecond;
 			pq.insert(newNode);
-			System.out.println("new node");
 		}
 		temp = pq.peek();
 		for (int i = 0; i < 26; i++) {
@@ -150,7 +145,6 @@ public class HuffmanCode {
 					int tempIndex = temp - 'a';
 					if (tempIndex < 26)
 						nodes.get(tempIndex).frequency++;
-					// else
 				}
 				counter++;
 			}
@@ -159,12 +153,6 @@ public class HuffmanCode {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		// System.out.println("frequencies start");
-		// for (QueueNode queueNode : nodes) {
-		// System.out.println(queueNode.frequency);
-		// }
-		//
-		// System.out.println("frequencies end");
 		return nodes;
 	}
 
@@ -263,9 +251,7 @@ public class HuffmanCode {
 				allWords.append(',');
 			}
 			input.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -279,7 +265,6 @@ public class HuffmanCode {
 		StringBuilder letters = new StringBuilder();
 		QueueNode head = pq.peek();
 		for (int i = n - 1; i > 0; i--) {
-			// for (int i = n - 1; i >= 0; i--) {
 			byte b = compressList.get(i);
 			for (int j = 0; j < 8; j++) {
 				// if least significant bit is one
@@ -300,7 +285,6 @@ public class HuffmanCode {
 		while (elements.hasMoreTokens()) {
 			decompressLst.add(elements.nextToken());
 		}
-		System.out.println(decompressLst.size());
 		writeStringToFile();
 	}
 
@@ -313,14 +297,12 @@ public class HuffmanCode {
 		try {
 			compressList = new ArrayList<Byte>();
 			in = new FileInputStream("wordlist_compressed.txt");
-			// read to the end line
 			while ((c = in.read()) != -1) {
 				compressList.add((byte) c);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.out.println(compressList.size());
 	}
 
 	/**
@@ -335,9 +317,7 @@ public class HuffmanCode {
 				out.write(bytes[i]);
 			}
 			out.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
