@@ -1,5 +1,6 @@
 package huffman;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 
 /**
@@ -15,6 +16,17 @@ public class PriorityQueue<E> {
 		nodesPQ = (E[]) new Object[size + 1];
 		for (int i = 0; i < size; i++) {
 			nodesPQ[i + 1] = nodes[i];
+		}
+		for (int i = size / 2; i >= 1; i--) {
+			sink(i);
+		}
+	}
+
+	public PriorityQueue(ArrayList<E> nodes) {
+		size = nodes.size();
+		nodesPQ = (E[]) new Object[size + 1];
+		for (int i = 0; i < size; i++) {
+			nodesPQ[i + 1] = nodes.get(i);
 		}
 		for (int i = size / 2; i >= 1; i--) {
 			sink(i);

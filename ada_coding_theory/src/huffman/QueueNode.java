@@ -12,6 +12,9 @@ public class QueueNode implements Comparable<QueueNode> {
 		this.frequency = fre;
 	}
 
+	public QueueNode() {
+	}
+
 	@Override
 	public int compareTo(QueueNode o) {
 		return frequency - o.frequency;

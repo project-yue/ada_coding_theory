@@ -45,7 +45,6 @@ public class HuffmanCode {
 		HuffmanCode huffman = new HuffmanCode();
 		huffman.compress();
 		huffman.decompress();
-		// huffman.decompress();
 	}
 
 	public HuffmanCode() {
@@ -104,17 +103,17 @@ public class HuffmanCode {
 	 */
 	private void buildHuffmanTree() {
 		QueueNode node;
+		ArrayList<QueueNode> nodeLst = countFrequency();
 		// indices are from a-z and the last one for ,
 		// should calculate the frequency
 		for (int i = 0; i < 27; i++) {
 			if (i == 26) {
-				node = new QueueNode(',', ALPHABET[i]);
+				node = new QueueNode(',', nodeLst.get(i).frequency);
 			} else {
-				node = new QueueNode((char) ('a' + i), ALPHABET[i]);
+				node = new QueueNode((char) ('a' + i), nodeLst.get(i).frequency);
 			}
 			nodes[i] = node;
 		}
-		//
 		pq = new PriorityQueue<QueueNode>(nodes);
 		while (pq.size > 1) {
 			QueueNode minFirst = pq.min();
@@ -124,6 +123,7 @@ public class HuffmanCode {
 			newNode.left = minFirst;
 			newNode.right = minSecond;
 			pq.insert(newNode);
+			System.out.println("new node");
 		}
 		temp = pq.peek();
 		for (int i = 0; i < 26; i++) {
@@ -134,23 +134,38 @@ public class HuffmanCode {
 		symbolArray[26] = huffmanCodeString.toString();
 	}
 
-	private void countFrequency() {
-		File mFile = null;
-		mFile = new File("wordlist.txt");
-		// TODO Auto-generated catch block
+	private ArrayList<QueueNode> countFrequency() {
+		File mFile = new File("wordlist.txt");
+		ArrayList<QueueNode> nodes = new ArrayList<>();
+		for (int i = 0; i < 27; i++) {
+			QueueNode temp = new QueueNode();
+			nodes.add(temp);
+		}
 		try {
 			BufferedReader input = new BufferedReader(new FileReader(mFile));
 			String line = null;
+			int counter = 0;
 			while ((line = input.readLine()) != null) {
-				allWords.append(line);
-				allWords.append(',');
+				for (char temp : line.toCharArray()) {
+					int tempIndex = temp - 'a';
+					if (tempIndex < 26)
+						nodes.get(tempIndex).frequency++;
+					// else
+				}
+				counter++;
 			}
+			nodes.get(26).frequency = counter;
 			input.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		// System.out.println("frequencies start");
+		// for (QueueNode queueNode : nodes) {
+		// System.out.println(queueNode.frequency);
+		// }
+		//
+		// System.out.println("frequencies end");
+		return nodes;
 	}
 
 	/**
