@@ -1,12 +1,13 @@
 package huffman;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 
 /**
  * A min priority queue with linked structure.
  */
-public class PriorityQueue<E> {
+public class PriorityQueue<E> implements Serializable {
 	public E[] nodesPQ;
 	public int size;
 	public Comparator<E> comparator;

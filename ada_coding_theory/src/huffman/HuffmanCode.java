@@ -6,7 +6,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Stack;
@@ -18,14 +22,13 @@ import java.util.StringTokenizer;
  * @author Yue
  * @version 06-09-14 compression and decompression work
  */
-public class HuffmanCode {
+public class HuffmanCode implements Serializable {
 	// the frequency of all letters in the txt
 	// the issue becomes counting frequency
 
 	public PriorityQueue<QueueNode> pq;
 	public int codeLength = 0;
 	public QueueNode temp;
-	public StringBuilder huffmanCodeString;
 	public String[] symbolArray;
 	public StringBuilder allWordsBuffer;
 	// hold all tokens in byte
@@ -37,8 +40,11 @@ public class HuffmanCode {
 
 	public static void main(String[] args) {
 		HuffmanCode huffman = new HuffmanCode();
-		huffman.compress();
-		huffman.decompress();
+		huffman.compress(new File("wordlist.txt"));
+		// huffman.decompress(new File("wordlst.arc"));
+		HuffmanCode deserHuffman = HuffmanCode.deserializeObject(new File(
+				"wordlist.ser"));
+		deserHuffman.decompress(new File("wordlist.arc"));
 	}
 
 	public HuffmanCode() {
@@ -49,14 +55,14 @@ public class HuffmanCode {
 		this.allWordsBuffer = new StringBuilder();
 	}
 
-	public void compress() {
+	public void compress(File file) {
 		buildHuffmanTree();
-		readRawContentFromFile();
-		writeBytesToFile();
+		readRawContentFromFile(file);
+		writeBytesToFile(file);
 	}
 
-	public void decompress() {
-		readBytesFromFile();
+	public void decompress(File file) {
+		readBytesFromFile(file);
 		decompressBytes();
 	}
 
@@ -65,12 +71,17 @@ public class HuffmanCode {
 	 * 
 	 */
 	private byte[] compressWord(String test) {
+		for (String i : symbolArray) {
+			System.out.println("symbol " + i);
+
+		}
 		BitSet bits = new BitSet();
 		StringBuilder s = new StringBuilder();
 		for (int i = 0; i < test.length(); i++) {
 			char c = test.charAt(i);
 			if (c == ',') {
 				s.append(symbolArray[26]);
+				// s.append(',');
 			} else {
 				// ascii arithmetic
 				s.append(symbolArray[(int) (c - 'a')]);
@@ -122,11 +133,10 @@ public class HuffmanCode {
 		}
 		temp = pq.peek();
 		for (int i = 0; i < 26; i++) {
-			lookup((char) ('a' + i));
-			symbolArray[i] = huffmanCodeString.toString();
+			symbolArray[i] = lookup((char) ('a' + i)).toString();
+
 		}
-		lookup(',');
-		symbolArray[26] = huffmanCodeString.toString();
+		symbolArray[26] = lookup(',').toString();
 	}
 
 	private ArrayList<QueueNode> countFrequency() {
@@ -174,10 +184,10 @@ public class HuffmanCode {
 	/**
 	 * look up the bit representation in a dfs manner
 	 */
-	private void lookup(char requiredChar) {
+	private StringBuilder lookup(char requiredChar) {
 		int[] huffmanCodeArrayForChar = new int[8];
 		codeLength = 0;
-		huffmanCodeString = new StringBuilder();
+		StringBuilder huffmanCodeString = new StringBuilder();
 		Stack<QueueNode> stack = new Stack<QueueNode>();
 		stack.push(temp);
 		while (!stack.isEmpty()) {
@@ -193,13 +203,16 @@ public class HuffmanCode {
 						huffmanCodeString.append(huffmanCodeArrayForChar[i]);
 					}
 					resetVisitedNodes(temp);
-					return;
+					System.out.println("Code length" + codeLength);
+					return huffmanCodeString;
 				}
 				stack.push(nextNode);
 				nextNode.visited = true;
 			}
+			System.out.println(codeLength);
 		}
 		resetVisitedNodes(temp);
+		return huffmanCodeString;
 	}
 
 	/**
@@ -239,8 +252,8 @@ public class HuffmanCode {
 	 * read the words from a file. The process constructs raw data in String
 	 * representation
 	 */
-	private void readRawContentFromFile() {
-		File tempFile = new File("wordlist.txt");
+	private void readRawContentFromFile(File tempFile) {
+		// File tempFile = new File("wordlist.txt");
 		try {
 			BufferedReader inputReader = new BufferedReader(new FileReader(
 					tempFile));
@@ -290,19 +303,12 @@ public class HuffmanCode {
 	/**
 	 * read file to bytes
 	 */
-	private void readBytesFromFile() {
+	private void readBytesFromFile(File file) {
 		FileInputStream in;
 		int c;
 		try {
-			in = new FileInputStream("wordlist_compressed.txt");
+			in = new FileInputStream(file);
 			compressList = new ArrayList<Byte>();
-			// skip the header files
-			// this is the length of the header
-			System.out.println(in.read());
-			System.out.println(in.read());
-			System.out.println(in.read());
-			in.skip(155);
-			// read header ends
 			while ((c = in.read()) != -1) {
 				compressList.add((byte) c);
 			}
@@ -311,27 +317,40 @@ public class HuffmanCode {
 		}
 	}
 
+	public static HuffmanCode deserializeObject(File file) {
+		HuffmanCode hc = null;
+		if (!file.toString().split("\\.")[1].equals("ser")) {
+			throw new IllegalArgumentException(
+					"surfix doesn't meet. must be \".ser\"");
+		}
+		FileInputStream fileIn;
+		try {
+			fileIn = new FileInputStream(file);
+			ObjectInputStream in = new ObjectInputStream(fileIn);
+			hc = (HuffmanCode) in.readObject();
+			in.close();
+			fileIn.close();
+		} catch (IOException | ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return hc;
+	}
+
 	/**
 	 * compression write bytes to file
 	 */
-	private void writeBytesToFile() {
+	private void writeBytesToFile(File file) {
 		FileOutputStream out = null;
 		try {
-			out = new FileOutputStream("wordlist_compressed.txt");
 			// for generate header
-			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i < this.nodeLst.size(); i++) {
-				sb.append(this.nodeLst.get(i).frequency);
-				if (i < this.nodeLst.size() - 1)
-					sb.append(",");
-			}
-			sb.insert(0, sb.toString().getBytes().length);
-			System.out.println("skip byte length "
-					+ sb.toString().getBytes().length);
-			byte[] header = sb.toString().getBytes();
-			for (int i = 0; i < header.length; i++)
-				out.write(header[i]);
+			FileOutputStream serOut = new FileOutputStream(file.toString()
+					.split("\\.")[0] + ".ser");
+			ObjectOutputStream objOut = new ObjectOutputStream(serOut);
+			objOut.writeObject(this);
+			objOut.close();
 			// header ends
+			out = new FileOutputStream(file.toString().split("\\.")[0] + ".arc");
 			byte[] bytes = compressWord(allWordsBuffer.toString());
 			for (int i = 0; i < bytes.length; i++) {
 				out.write(bytes[i]);
@@ -348,6 +367,7 @@ public class HuffmanCode {
 	private void writeStringToFile() {
 		FileOutputStream out = null;
 		try {
+			//
 			out = new FileOutputStream("wordlist_decompressed.txt");
 			PrintStream ps = new PrintStream(out);
 			for (String temp : this.decompressLst) {

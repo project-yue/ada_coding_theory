@@ -1,6 +1,8 @@
 package huffman;
 
-public class QueueNode implements Comparable<QueueNode> {
+import java.io.Serializable;
+
+public class QueueNode implements Comparable<QueueNode>, Serializable {
 	public char value;
 	public int frequency;
 	public QueueNode left = null;
