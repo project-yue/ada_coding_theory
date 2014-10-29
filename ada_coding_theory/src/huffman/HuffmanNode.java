@@ -9,9 +9,9 @@ public class HuffmanNode implements Comparable<HuffmanNode> {
 	/**
 	 * Constructs a leaf node.
 	 */
-	public HuffmanNode(int _symbol, int _weight) {
-		symbol = _symbol;
-		weight = _weight;
+	public HuffmanNode(int symbol, int weight) {
+		this.symbol = symbol;
+		this.weight = weight;
 		leftChild = rightChild = parent = null;
 	}
 
@@ -33,17 +33,18 @@ public class HuffmanNode implements Comparable<HuffmanNode> {
 		int level = l;
 		String atNode = Character.toString((char) symbol);
 		if (symbol == HuffmanTree.INCOMPLETE_CODE)
-			atNode = " ";
+			atNode = "incomplete  " + "  " + weight;
 		else if (symbol == HuffmanTree.EOF)
-			atNode = "EOF";
+			atNode = "EOF           " + weight;
 		else if (symbol == '\n')
-			atNode = "newline";
+			atNode = "newline       " + weight;
 		else if (symbol == '\t')
-			atNode = "tab";
+			atNode = "tab           " + weight;
 		else if (symbol == ' ')
-			atNode = "space";
-		atNode += " " + weight;
-		String ret = atNode + " " + weight;
+			atNode = "space         " + weight;
+		else
+			atNode += "             " + weight;
+		String ret = atNode + " ";
 		if (leftChild != null) {
 			int temp = level;
 			ret += ":left child:" + leftChild.symbol + ":level " + level

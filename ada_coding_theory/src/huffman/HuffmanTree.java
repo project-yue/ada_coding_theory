@@ -19,8 +19,8 @@ import java.util.PriorityQueue;
 public class HuffmanTree {
 
 	public final static int FAULT = -3;
-	public final static int EOF = 0;
 	public final static int INCOMPLETE_CODE = -2;
+	public final static int EOF = 0;
 
 	public HuffmanNode root;
 	// mapping chars to nodes
@@ -46,6 +46,7 @@ public class HuffmanTree {
 			BitWriter bout = new BitWriter(out);
 			for (int ch : data)
 				bout.writeBits(getCode(ch & 0xff));
+			// bitwise AND operation
 			bout.close();
 		} catch (IOException e) {
 			System.err.println(e);
@@ -120,6 +121,7 @@ public class HuffmanTree {
 				continue;
 			else if (decode == FAULT)
 				throw new IOException("Decoding error");
+			// completed
 			else if (decode == EOF)
 				return;
 			data.add(decode);
@@ -164,7 +166,7 @@ public class HuffmanTree {
 			pq.offer(combo);
 		}
 		root = pq.element();
-		System.out.println(root);
+		// System.out.println(root);
 	}
 
 	private int[] getCode(int ch) {
