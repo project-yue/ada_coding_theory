@@ -5,6 +5,8 @@ import java.io.FileReader;
 import java.io.IOException;
 
 /**
+ * Demo class for showing the compression and decompression processes with
+ * compression rate
  * 
  * @author yue
  *
@@ -15,8 +17,8 @@ public class HuffmanCodeDemo {
 		String testString = new String();
 		double outChar = 0, compSize = 0;
 		String result = "";
-		String compressFileTarget = "wordlist.txt";
-		String decompressFileTarget = "wordlist.arc";
+		String compressFileTarget = "shell_scripting";
+		String decompressFileTarget = "shell_scripting.arc";
 		try {
 			BufferedReader ba = new BufferedReader(new FileReader(
 					compressFileTarget));
@@ -38,11 +40,12 @@ public class HuffmanCodeDemo {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(
 					compressFileTarget));
-			String tempLineFeed = br.readLine();
-			while (tempLineFeed != null) {
+			String tempLineFeed;
+			do {
+				tempLineFeed = br.readLine();
 				result += tempLineFeed;
 				tempLineFeed = br.readLine();
-			}
+			} while (tempLineFeed != null);
 			br.close();
 			br = new BufferedReader(new FileReader(decompressFileTarget));
 			outChar = br.read();

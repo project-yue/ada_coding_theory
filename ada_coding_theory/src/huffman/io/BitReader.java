@@ -34,6 +34,9 @@ public class BitReader extends BitOperator {
 	}
 
 	private int getBit(int pack, int pos) {
+		// shift 1 left with bits of the postion
+		// bitwise AND operation between 2 binary
+		// if the result is not 0 returns 1
 		return (pack & (1 << pos)) != 0 ? 1 : 0;
 	}
 }
