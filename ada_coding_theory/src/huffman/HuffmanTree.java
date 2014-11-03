@@ -16,6 +16,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
+/**
+ * 
+ * @author yue
+ *
+ */
 public class HuffmanTree {
 
 	public final static int FAULT = -3;
@@ -26,6 +31,9 @@ public class HuffmanTree {
 	// mapping chars to nodes
 	public Map<Integer, HuffmanNode> symbols;
 	public List<Integer> data;
+
+	public HuffmanTree() {
+	}
 
 	/**
 	 * Compress a file, and output the result to another file
@@ -155,7 +163,6 @@ public class HuffmanTree {
 	private void createTree() {
 		PriorityQueue<HuffmanNode> pq = new PriorityQueue<HuffmanNode>();
 		pq.addAll(symbols.values());
-
 		while (pq.size() > 1) {
 			HuffmanNode left = pq.remove();
 			HuffmanNode right = pq.remove();
@@ -166,7 +173,7 @@ public class HuffmanTree {
 			pq.offer(combo);
 		}
 		root = pq.element();
-		// System.out.println(root);
+		System.out.println(root);
 	}
 
 	private int[] getCode(int ch) {

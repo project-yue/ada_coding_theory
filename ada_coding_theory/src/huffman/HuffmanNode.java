@@ -1,5 +1,10 @@
 package huffman;
 
+/**
+ * 
+ * @author yue
+ *
+ */
 public class HuffmanNode implements Comparable<HuffmanNode> {
 
 	public HuffmanNode leftChild, rightChild, parent;
@@ -45,15 +50,28 @@ public class HuffmanNode implements Comparable<HuffmanNode> {
 		else
 			atNode += "             " + weight;
 		String ret = atNode + " ";
-		if (leftChild != null) {
+		if (parent == null) {
+			int temp = level;
+			ret += ":root:" + symbol + ":level " + temp + ":\n"
+					+ leftChild.constructTreeInfo(temp + 1) + "\n"
+					+ rightChild.constructTreeInfo(temp + 1);
+		} else if (leftChild != null && rightChild != null) {
+			int temp = level;
+			ret += ":left child:" + leftChild.symbol + " :level " + level
+					+ ":right child:" + " " + rightChild.symbol + " :level "
+					+ level + ":\n";
+			ret += leftChild.constructTreeInfo(temp + 1) + "\n";
+			ret += rightChild.constructTreeInfo(temp + 1);
+		} else if (leftChild != null) {
 			int temp = level;
 			ret += ":left child:" + leftChild.symbol + ":level " + level
 					+ ":\n" + leftChild.constructTreeInfo(++temp);
-		}
-		if (rightChild != null) {
+		} else if (rightChild != null) {
 			int temp = level;
 			ret += ":right child:" + rightChild.symbol + ":level " + level
 					+ ":\n" + rightChild.constructTreeInfo(++temp);
+		} else if (parent != null) {
+			ret += ":p weight: " + parent.weight + " :level " + level + ":";
 		}
 		return ret;
 	}
