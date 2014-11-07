@@ -9,19 +9,19 @@ public class BitReader extends BitOperator {
 
 	public BitReader(InputStream is) {
 		this.in = is;
-		this.bufferPos = BITS_PER_BYTE;
+		super.bufferPos = BITS_PER_BYTE;
 	}
 
 	public int readBit() throws IOException {
-		if (this.bufferPos == BITS_PER_BYTE) {
-			this.buffer = this.in.read();
-			if (this.buffer == -1) {
+		if (super.bufferPos == BITS_PER_BYTE) {
+			super.buffer = this.in.read();
+			if (super.buffer == -1) {
 				return -1;
 			}
-			this.bufferPos = 0;
+			super.bufferPos = 0;
 		}
 
-		return getBit(this.buffer, this.bufferPos++);
+		return getBit(super.buffer, super.bufferPos++);
 	}
 
 	@Override
@@ -36,7 +36,10 @@ public class BitReader extends BitOperator {
 	private int getBit(int pack, int pos) {
 		// shift 1 left with bits of the postion
 		// bitwise AND operation between 2 binary
-		// if the result is not 0 returns 1
-		return (pack & (1 << pos)) != 0 ? 1 : 0;
+		if ((pack & (1 << pos)) != 0) {
+			return 1;
+		} else {
+			return 0;
+		}
 	}
 }

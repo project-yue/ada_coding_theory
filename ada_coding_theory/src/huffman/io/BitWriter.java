@@ -12,24 +12,25 @@ public class BitWriter extends BitOperator {
 		this.out = os;
 	}
 
-	public void writeBit(int val) throws IOException {
-		this.buffer = setBit(this.buffer, this.bufferPos++, val);
-		if (this.bufferPos == BITS_PER_BYTE)
-			flush();
-	}
-
-	public void writeBits(int[] val) throws IOException {
+	public void writeBits(int[] val) {
 		for (int i = 0; i < val.length; i++)
 			writeBit(val[i]);
 	}
 
-	public void flush() throws IOException {
-		if (this.bufferPos == 0)
+	/**
+	 * write the buffer to file and clear the buffer
+	 */
+	public void flush() {
+		if (super.bufferPos == 0)
 			return;
-
-		this.out.write(this.buffer);
-		this.bufferPos = 0;
-		this.buffer = 0;
+		try {
+			System.out.println(super.buffer);
+			this.out.write(super.buffer);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		super.bufferPos = 0;
+		super.buffer = 0;
 	}
 
 	@Override
@@ -42,9 +43,20 @@ public class BitWriter extends BitOperator {
 		}
 	}
 
-	private int setBit(int pack, int pos, int val) {
-		if (val == 1)
-			pack |= (val << pos);
-		return pack;
+	private void writeBit(int val) {
+		super.buffer = arrangeBitToBits(super.buffer, super.bufferPos++, val);
+		if (super.bufferPos == BITS_PER_BYTE)
+			flush();
+	}
+
+	private int arrangeBitToBits(int buffer, int position, int val) {
+		if (val == 1) {
+			// bitwise OR
+			buffer |= (val << position);
+			System.out.println(Integer.toBinaryString(buffer) + " "
+					+ Integer.toBinaryString(position) + " "
+					+ Integer.toBinaryString(val));
+		}
+		return buffer;
 	}
 }
